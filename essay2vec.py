@@ -23,8 +23,8 @@ df_all = df_all.drop('rater2_domain1', 1)
 df_all = df_all.drop('essay_id', 1)
 
 X_train, X_test, y_train, y_test = train_test_split(df_all['essay'], df_all['domain1_score'], test_size=0.10)
-y_train = np.reshape(y_train, (len(y_train), 1))
-y_test = np.reshape(y_test, (len(y_test), 1))
+y_train = y_train.values.reshape(len(y_train),1)
+y_test = y_test.values.reshape(len(y_test),1)
 
 def essay_to_wordlist(essay_v, remove_stopwords):
     essay_v = re.sub("[^a-zA-Z]", " ", essay_v)
@@ -70,21 +70,21 @@ model.save(model_name)
 
 def makeFeatureVec(words, model, num_features):
     featureVec = np.zeros((num_features,),dtype="float32")
-    nwords = 0.
-    index2word_set = set(model.index2word)
+    nwords = 0
+    index2word_set = set(model.wv.index2word)
     for word in words:
         if word in index2word_set: 
-            nwords = nwords + 1.
+            nwords = nwords + 1
             featureVec = np.add(featureVec,model[word])        
     featureVec = np.divide(featureVec,nwords)
     return featureVec
 
 def getAvgFeatureVecs(essays, model, num_features):
-    counter = 0.
+    counter = 0
     essayFeatureVecs = np.zeros((len(essays),num_features),dtype="float32")
     for essay in essays:
         essayFeatureVecs[counter] = makeFeatureVec(essay, model, num_features)
-        counter = counter + 1.
+        counter = counter + 1
     return essayFeatureVecs
 
 print ("Creating average feature vecs for Training Essays")
